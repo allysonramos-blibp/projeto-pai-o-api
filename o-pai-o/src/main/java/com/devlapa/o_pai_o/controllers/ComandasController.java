@@ -29,7 +29,7 @@ public class ComandasController {
         var lista = repository.findAll().stream().map(ComandaResponseDTO::new).toList();
         return ResponseEntity.ok(lista);
     }
-
+    
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
     public ResponseEntity<ComandaResponseDTO> abrir(@RequestBody @Valid ComandaRequestDTO dados) {
