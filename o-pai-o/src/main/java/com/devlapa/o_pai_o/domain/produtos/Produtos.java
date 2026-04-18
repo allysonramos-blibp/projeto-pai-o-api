@@ -3,6 +3,7 @@ package com.devlapa.o_pai_o.domain.produtos;
 import com.devlapa.o_pai_o.domain.categorias.Categorias;
 import com.devlapa.o_pai_o.domain.estoque.Estoque;
 import com.devlapa.o_pai_o.domain.fornecedores.Fornecedores;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,6 +42,7 @@ public class Produtos {
 
 
     @OneToOne(mappedBy = "produto", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Estoque estoque;
 
     @PrePersist

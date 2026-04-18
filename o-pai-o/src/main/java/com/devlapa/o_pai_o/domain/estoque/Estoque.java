@@ -1,6 +1,7 @@
 package com.devlapa.o_pai_o.domain.estoque;
 
 import com.devlapa.o_pai_o.domain.produtos.Produtos;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class Estoque {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "produto_id")
+    @JsonIgnore
     private Produtos produto;
 
     private Integer quantidade;

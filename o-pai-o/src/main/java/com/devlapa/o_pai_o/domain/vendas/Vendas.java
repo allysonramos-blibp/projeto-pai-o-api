@@ -4,6 +4,7 @@ import com.devlapa.o_pai_o.domain.formasPagamentos.FormasPagamentos;
 import com.devlapa.o_pai_o.domain.itensVenda.ItensDeVenda;
 import com.devlapa.o_pai_o.domain.usuarios.Usuarios;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -46,8 +47,9 @@ public class Vendas {
 
 
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonManagedReference
     private List<ItensDeVenda> itens;
+
 
 
 }

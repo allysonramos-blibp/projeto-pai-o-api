@@ -2,6 +2,7 @@ package com.devlapa.o_pai_o.domain.itensVenda;
 
 import com.devlapa.o_pai_o.domain.produtos.Produtos;
 import com.devlapa.o_pai_o.domain.vendas.Vendas;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class ItensDeVenda {
 
     @ManyToOne
     @JoinColumn(name = "vendas_id")
-    @JsonIgnore
+    @JsonBackReference
     private Vendas venda;
 
     @ManyToOne
@@ -40,6 +41,7 @@ public class ItensDeVenda {
     @Column(nullable = false,name = "sub_total")
     private BigDecimal precoTotal = BigDecimal.ZERO;
 
+    @PrePersist
     @PreUpdate
     public void calcularPrecoTotal(){
         if(precoUnitario != null && quantidade > 0){
