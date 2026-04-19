@@ -3,7 +3,6 @@ package com.devlapa.o_pai_o.domain.itensVenda;
 import com.devlapa.o_pai_o.domain.produtos.Produtos;
 import com.devlapa.o_pai_o.domain.vendas.Vendas;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +18,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItensDeVenda {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,18 +33,20 @@ public class ItensDeVenda {
     private Produtos produto;
 
     @Column(nullable = false)
-    private int quantidade;
+    private Integer quantidade;
 
     @Column(nullable = false, name = "preco_unitario")
     private BigDecimal precoUnitario = BigDecimal.ZERO;
 
-    @Column(nullable = false,name = "sub_total")
+    @Column(nullable = false, name = "sub_total")
     private BigDecimal precoTotal = BigDecimal.ZERO;
 
+    // ✅ CORRIGIDO: quantidade agora é Integer (não int primitivo),
+    // permitindo checagem de nulidade no updateItem do service
     @PrePersist
     @PreUpdate
-    public void calcularPrecoTotal(){
-        if(precoUnitario != null && quantidade > 0){
+    public void calcularPrecoTotal() {
+        if (precoUnitario != null && quantidade != null && quantidade > 0) {
             this.precoTotal = precoUnitario.multiply(BigDecimal.valueOf(quantidade));
         }
     }

@@ -11,7 +11,8 @@
     import org.springframework.security.core.annotation.AuthenticationPrincipal;
     import org.springframework.validation.annotation.Validated;
     import org.springframework.web.bind.annotation.*;
-    
+
+    import java.math.BigDecimal;
     import java.util.List;
     
     @RestController
@@ -44,7 +45,7 @@
         public ResponseEntity<VendasResponseDTO> getIdVenda(@PathVariable Long id){
             return ResponseEntity.ok(vendasService.getVendaById(id));
         }
-    
+
         @PatchMapping("/{id}/finalizar")
         @PreAuthorize("hasAnyRole('ADMIN','GERENTE','USUARIO')")
         public ResponseEntity<VendasResponseDTO> finalizarVendas(@PathVariable Long id, @RequestBody VendasRequestDTO body){
@@ -64,5 +65,12 @@
             }catch (Exception e){
                 throw new RuntimeException(e);
             }
+        }
+
+
+        @GetMapping("/total-hoje")
+        @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
+        public ResponseEntity<BigDecimal> getTotalHoje() {
+            return ResponseEntity.ok(vendasService.getTotalHoje());
         }
     }
