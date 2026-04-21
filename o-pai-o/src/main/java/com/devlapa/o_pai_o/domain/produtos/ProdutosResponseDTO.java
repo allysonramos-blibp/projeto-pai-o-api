@@ -9,6 +9,7 @@ public record ProdutosResponseDTO(
         BigDecimal preco,
         String unidade,
         Long categoriaId,
+        String nomeCategoria,
         Long fornecedorId,
         Boolean ativo,
         LocalDateTime datacricao,
@@ -22,10 +23,10 @@ public record ProdutosResponseDTO(
                 produto.getPreco(),
                 produto.getUnidade(),
                 produto.getCategoria() != null ? produto.getCategoria().getId() : null,
+                produto.getCategoria() != null ? produto.getCategoria().getNome() : "Sem Categoria",
                 produto.getFornecedor() != null ? produto.getFornecedor().getId() : null,
                 produto.getAtivo(),
                 produto.getDataCriacao(),
-                
                 produto.getEstoque() != null ? produto.getEstoque().getQuantidade() : 0,
                 produto.getEstoque() != null ? produto.getEstoque().getMinimo() : 0
         );

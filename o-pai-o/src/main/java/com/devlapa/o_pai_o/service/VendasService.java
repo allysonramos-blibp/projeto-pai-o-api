@@ -86,7 +86,7 @@ public class VendasService {
 
     @Transactional(readOnly = true)
     public List<VendasResponseDTO> getVendas(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending());
         Page<Vendas> vendasPage = this.vendasRepository.findAll(pageable);
         return vendasPage.map(event -> new VendasResponseDTO(
                 event.getId(),
@@ -171,4 +171,21 @@ public class VendasService {
         LocalDateTime fimDia = inicioDia.plusDays(1);
         return vendasRepository.somarTotalPorPeriodo(inicioDia, fimDia, StatusVenda.PAGA);
     }
+
+    @Transactional
+    public  Vendas atualizarFormaPagamento(Long id, Long novaFormaId) {
+        Vendas venda = vendasRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Venda não encontrada"));
+
+        if (venda.getStatus() != StatusVenda.ABERTA) {
+            throw new RuntimeException("Não é possivel alterar a forma de pagamento de uma venda finalizada");
+        }
+
+        FormasPagamentos novaForma = formasPagamentosRopository.findById(novaFormaId)
+                .orElseThrow(()-> new RuntimeException("Forma de pagamento não encontrada"));
+
+        venda.setFormasPagamentos(novaForma);
+        return vendasRepository.save(venda);
+    }
+
 }

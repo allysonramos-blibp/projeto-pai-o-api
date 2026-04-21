@@ -45,9 +45,6 @@ public class Vendas {
         this.data_criacao = LocalDateTime.now();
     }
 
-    // ✅ CORRIGIDO: fetch alterado para EAGER para garantir que os itens
-    // sejam sempre carregados junto com a venda, evitando LazyInitializationException
-    // Alternativa mais leve: manter LAZY e garantir @Transactional nos services (já feito)
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<ItensDeVenda> itens = new ArrayList<>();

@@ -41,8 +41,6 @@ public class ItensDeVenda {
     @Column(nullable = false, name = "sub_total")
     private BigDecimal precoTotal = BigDecimal.ZERO;
 
-    // ✅ CORRIGIDO: quantidade agora é Integer (não int primitivo),
-    // permitindo checagem de nulidade no updateItem do service
     @PrePersist
     @PreUpdate
     public void calcularPrecoTotal() {
