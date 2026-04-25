@@ -21,7 +21,8 @@ public class EstoqueService {
 
     @Transactional
     public void cadastrar(EstoqueRequestDTO dados){
-        var produto = produtosRepository.getReferenceById(dados.produtoId());
+        var produto = produtosRepository.findById(dados.produtoId())
+                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
         var estoque = new Estoque(
                 null,
@@ -52,6 +53,25 @@ public class EstoqueService {
         estoque.setQuantidade(estoque.getQuantidade() + quantidadeAdicional);
         estoque.verificarStatus();
 
+        repository.save(estoque);
+    }
+
+    @Transactional
+    public void atualizarPeloProduto(Long produtoId, Integer novaQuantidade, Integer novoMinimo) {
+
+        var estoque = repository.findByProdutoId(produtoId)
+                .orElseGet(() -> {
+                    var e = new Estoque();
+                    e.setProduto(produtosRepository.getReferenceById(produtoId));
+                    e.setDataCadastro(LocalDateTime.now());
+                    return e;
+                });
+
+        estoque.setQuantidade(novaQuantidade);
+        estoque.setMinimo(novoMinimo);
+        estoque.setDataModificacao(LocalDateTime.now());
+
+        estoque.verificarStatus();
         repository.save(estoque);
     }
     @Transactional

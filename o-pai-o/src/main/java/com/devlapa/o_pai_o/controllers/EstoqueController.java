@@ -5,6 +5,7 @@ import com.devlapa.o_pai_o.domain.estoque.EstoqueRequestDTO;
 import com.devlapa.o_pai_o.domain.estoque.EstoqueResponseDTO;
 import com.devlapa.o_pai_o.repositories.EstoqueRepository;
 import com.devlapa.o_pai_o.service.EstoqueService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,19 @@ public class EstoqueController {
 
         var estoque = repository.getReferenceById(id);
         return ResponseEntity.ok(new EstoqueResponseDTO(estoque));
+    }
+
+    @PutMapping("/produto/{produtoId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @Transactional
+    public ResponseEntity<Void> atualizarPeloProduto(
+            @PathVariable Long produtoId,
+            @RequestBody @Valid EstoqueRequestDTO dados) {
+
+
+        service.atualizarPeloProduto(produtoId, dados.quantidade(), dados.minimo());
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/comandas")
@@ -39,11 +39,9 @@ public class ComandasController {
 
     @PostMapping("/{id}/itens")
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
-
     public ResponseEntity<ItemResponseDTO> adicionarItem(
             @PathVariable Long id,
             @RequestBody @Valid ItemRequestDTO dados) {
-
         var item = comandaService.adicionarItem(id, dados.produtoId(), dados.quantidade());
         return ResponseEntity.ok(new ItemResponseDTO(item));
     }
@@ -57,8 +55,26 @@ public class ComandasController {
 
     @PatchMapping("/{id}/finalizar")
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
-    public ResponseEntity<Comanda> finalizar(@PathVariable Long id) {
-        Comanda comandaFinalizada = comandaService.finalizarPagamento(id);
-        return ResponseEntity.ok(comandaFinalizada);
+    public ResponseEntity<ComandaResponseDTO> finalizar(
+            @PathVariable Long id,
+            @RequestBody Map<String, Long> body) {
+        Long formaPagamentoId = body.get("formaPagamentoId");
+        Comanda comandaFinalizada = comandaService.finalizarPagamento(id, formaPagamentoId);
+        return ResponseEntity.ok(new ComandaResponseDTO(comandaFinalizada));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    public ResponseEntity<ComandaResponseDTO> buscarPorId(@PathVariable Long id) {
+        var comanda = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comanda não encontrada"));
+        return ResponseEntity.ok(new ComandaResponseDTO(comanda));
+    }
+
+    @DeleteMapping("/itens/{itemId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    public ResponseEntity<Void> removerItem(@PathVariable Long itemId) {
+        comandaService.removerItem(itemId);
+        return ResponseEntity.noContent().build();
     }
 }

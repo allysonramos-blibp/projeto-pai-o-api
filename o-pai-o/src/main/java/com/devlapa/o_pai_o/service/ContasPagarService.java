@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContasPagarService {
@@ -63,15 +65,39 @@ public class ContasPagarService {
     @Transactional
     public void marcarComoPaga(Long id) {
         var conta = buscarConta(id);
-        if (conta.getStatus() == StatusConta.RECEBIDO) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Conta ja esta paga");
+
+
+        if (StatusConta.PAGA.equals(conta.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta conta já foi paga.");
         }
-        if (conta.getStatus() == StatusConta.CANCELADA) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Conta cancelada nao pode ser paga");
+
+        if (StatusConta.CANCELADA.equals(conta.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Conta cancelada não pode ser paga.");
         }
-        conta.setStatus(StatusConta.RECEBIDO);
+
+        conta.setStatus(StatusConta.PAGA);
         conta.setDataPagamento(LocalDate.now());
         repository.save(conta);
+    }
+
+    public Map<String, BigDecimal> obterResumoFinanceiro() {
+        List<ContaPagar> todas = repository.findAll();
+
+
+        BigDecimal totalPago = todas.stream()
+                .filter(c -> StatusConta.PAGA.equals(c.getStatus()))
+                .map(ContaPagar::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        
+        BigDecimal totalVencido = todas.stream()
+                .filter(c -> !StatusConta.PAGA.equals(c.getStatus()) &&
+                        c.getDataVencimento() != null &&
+                        c.getDataVencimento().isBefore(LocalDate.now()))
+                .map(ContaPagar::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return Map.of("TotalPago", totalPago, "TotalVencido", totalVencido);
     }
 
     @Transactional
@@ -81,16 +107,16 @@ public class ContasPagarService {
 
     private ContaPagar buscarConta(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta nao encontrada"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Conta não encontrada"));
     }
 
     private Fornecedores buscarFornecedor(Long fornecedorId) {
         return fornecedorRepository.findById(fornecedorId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fornecedor nao encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fornecedor não encontrado"));
     }
 
     private Usuarios buscarUsuario(Long usuarioId) {
         return usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario nao encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
     }
 }

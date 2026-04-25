@@ -48,8 +48,8 @@ public class FormasPagamentoService {
                 event.getNome(),
                 event.getDescricao(),
                 event.getTipo(),
-                event.isAtivo(),
                 event.isPermitirParcelamento(),
+                event.isAtivo(),
                 event.getData_criacao(),
                 event.getData_modificacao()
         )).stream().toList();

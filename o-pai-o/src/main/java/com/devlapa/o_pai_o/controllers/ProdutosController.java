@@ -1,10 +1,13 @@
 package com.devlapa.o_pai_o.controllers;
 
+import com.devlapa.o_pai_o.domain.produtos.ProdutoUpdateDTO;
 import com.devlapa.o_pai_o.domain.produtos.Produtos;
 import com.devlapa.o_pai_o.domain.produtos.ProdutosRequestDTO;
 import com.devlapa.o_pai_o.domain.produtos.ProdutosResponseDTO;
 import com.devlapa.o_pai_o.repositories.ProdutosRepository;
+import com.devlapa.o_pai_o.service.EstoqueService;
 import com.devlapa.o_pai_o.service.ProdutoService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,9 +63,14 @@ public class ProdutosController {
     }
 
 
+
+    @Autowired
+    private EstoqueService estoqueService;
+
     @PatchMapping("/update/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
-    public ResponseEntity<Produtos> updateProduto(@PathVariable Long id, @RequestBody Map<String, Object> fields){
+    public ResponseEntity<Produtos> updateProduto(@PathVariable Long id, @RequestBody @Validated ProdutoUpdateDTO fields){
+
         Produtos updated = produtoService.updateProdutos(id, fields);
         return ResponseEntity.ok(updated);
     }

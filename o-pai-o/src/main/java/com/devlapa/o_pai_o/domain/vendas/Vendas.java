@@ -3,16 +3,17 @@ package com.devlapa.o_pai_o.domain.vendas;
 import com.devlapa.o_pai_o.domain.formasPagamentos.FormasPagamentos;
 import com.devlapa.o_pai_o.domain.itensVenda.ItensDeVenda;
 import com.devlapa.o_pai_o.domain.usuarios.Usuarios;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table (name = "vendas")
+@Table(name = "vendas")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,7 +25,7 @@ public class Vendas {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "formadepagamento_id",nullable = false)
+    @JoinColumn(name = "formadepagamento_id", nullable = false)
     private FormasPagamentos formasPagamentos;
 
     @Column(nullable = false)
@@ -36,18 +37,15 @@ public class Vendas {
     private LocalDateTime data_criacao;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id",nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuarios usuarioCriacao;
 
     @PrePersist
-    public void PrePersist(){
+    public void PrePersist() {
         this.data_criacao = LocalDateTime.now();
     }
 
-
-    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<ItensDeVenda> itens;
-
-
+    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<ItensDeVenda> itens = new ArrayList<>();
 }

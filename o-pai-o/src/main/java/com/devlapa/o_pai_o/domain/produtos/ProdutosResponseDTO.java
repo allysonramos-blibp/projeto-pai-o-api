@@ -1,19 +1,34 @@
 package com.devlapa.o_pai_o.domain.produtos;
 
-import com.devlapa.o_pai_o.domain.categorias.Categorias;
-import com.devlapa.o_pai_o.domain.fornecedores.Fornecedores;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public record ProdutosResponseDTO(
         Long id,
         String nome,
         BigDecimal preco,
         String unidade,
-        Categorias categoria,
-        Fornecedores fornecedor,
+        Long categoriaId,
+        String nomeCategoria,
+        Long fornecedorId,
         Boolean ativo,
-        LocalDateTime datacricao
-) {}
+        LocalDateTime datacricao,
+        Integer estoque_atual,
+        Integer estoque_minimo
+) {
+    public ProdutosResponseDTO(Produtos produto) {
+        this(
+                produto.getId(),
+                produto.getNome(),
+                produto.getPreco(),
+                produto.getUnidade(),
+                produto.getCategoria() != null ? produto.getCategoria().getId() : null,
+                produto.getCategoria() != null ? produto.getCategoria().getNome() : "Sem Categoria",
+                produto.getFornecedor() != null ? produto.getFornecedor().getId() : null,
+                produto.getAtivo(),
+                produto.getDataCriacao(),
+                produto.getEstoque() != null ? produto.getEstoque().getQuantidade() : 0,
+                produto.getEstoque() != null ? produto.getEstoque().getMinimo() : 0
+        );
+    }
+}
