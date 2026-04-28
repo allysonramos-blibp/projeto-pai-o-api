@@ -4,20 +4,27 @@ import com.devlapa.o_pai_o.domain.comandas.Comanda;
 import com.devlapa.o_pai_o.domain.comandas.ComandaRequestDTO;
 import com.devlapa.o_pai_o.domain.comandas.ItemComanda;
 import com.devlapa.o_pai_o.domain.comandas.StatusComanda;
+import com.devlapa.o_pai_o.domain.contas.ContasReceber;
+import com.devlapa.o_pai_o.domain.contas.StatusConta;
 import com.devlapa.o_pai_o.domain.estoque.Estoque;
 import com.devlapa.o_pai_o.domain.formasPagamentos.FormasPagamentos;
 import com.devlapa.o_pai_o.domain.produtos.Produtos;
+import com.devlapa.o_pai_o.domain.usuarios.Usuarios;
 import com.devlapa.o_pai_o.repositories.ComandaRepository;
+import com.devlapa.o_pai_o.repositories.ContasReceberRepository;
 import com.devlapa.o_pai_o.repositories.EstoqueRepository;
 import com.devlapa.o_pai_o.repositories.FormasPagamentosRopository;
 import com.devlapa.o_pai_o.repositories.ItemComandaRepository;
 import com.devlapa.o_pai_o.repositories.ProdutosRepository;
+import com.devlapa.o_pai_o.repositories.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class ComandaService {
@@ -36,6 +43,12 @@ public class ComandaService {
 
     @Autowired
     private FormasPagamentosRopository formasPagamentosRopository;
+
+    @Autowired
+    private ContasReceberRepository contasReceberRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public Comanda abrirNovaComanda(ComandaRequestDTO dados) {
         Comanda comanda = new Comanda();
@@ -129,7 +142,7 @@ public class ComandaService {
     }
 
     @Transactional
-    public Comanda finalizarPagamento(Long id, Long formaPagamentoId) {
+    public Comanda finalizarPagamento(Long id, Long formaPagamentoId, Long usuarioId, boolean pagarDepois) {
         Comanda comanda = comandaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comanda não encontrada"));
 
@@ -141,16 +154,46 @@ public class ComandaService {
             throw new RuntimeException("Não é possível finalizar uma comanda sem consumo (valor zero).");
         }
 
-        FormasPagamentos forma = formasPagamentosRopository.findById(formaPagamentoId)
-                .orElseThrow(() -> new RuntimeException("Forma de pagamento não encontrada: " + formaPagamentoId));
-
-        if (!forma.isAtivo()) {
-            throw new RuntimeException("A forma de pagamento selecionada está inativa.");
+        if (usuarioId == null) {
+            throw new RuntimeException("usuarioId é obrigatório para finalizar a comanda.");
         }
 
-        comanda.setFormaPagamento(forma);
-        comanda.setStatus(StatusComanda.FINALIZADA);
+        Usuarios usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + usuarioId));
 
-        return comandaRepository.save(comanda);
+        // Vincula forma de pagamento apenas se pagar agora
+        if (!pagarDepois) {
+            if (formaPagamentoId == null) {
+                throw new RuntimeException("Forma de pagamento é obrigatória ao pagar agora.");
+            }
+            FormasPagamentos forma = formasPagamentosRopository.findById(formaPagamentoId)
+                    .orElseThrow(() -> new RuntimeException("Forma de pagamento não encontrada: " + formaPagamentoId));
+            if (!forma.isAtivo()) {
+                throw new RuntimeException("A forma de pagamento selecionada está inativa.");
+            }
+            comanda.setFormaPagamento(forma);
+        }
+
+        comanda.setStatus(StatusComanda.FINALIZADA);
+        Comanda comandaSalva = comandaRepository.save(comanda);
+
+        // Cria conta a receber automaticamente
+        ContasReceber conta = new ContasReceber();
+        conta.setCliente(comanda.getNomeCliente() != null ? comanda.getNomeCliente() : "Mesa " + comanda.getNumeroMesa());
+        conta.setDescricao("Comanda #" + comanda.getId() + " — Mesa " + comanda.getNumeroMesa());
+        conta.setValor(comanda.getValorTotal());
+        conta.setDataVencimento(LocalDate.now());
+        conta.setDatacriacao(LocalDateTime.now());
+        conta.setComanda(comandaSalva);
+        conta.setUserCriacao(usuario);
+        conta.setStatus(pagarDepois ? StatusConta.PENDENTE : StatusConta.RECEBIDO);
+
+        if (!pagarDepois) {
+            conta.setDataRecebimento(LocalDate.now());
+        }
+
+        contasReceberRepository.save(conta);
+
+        return comandaSalva;
     }
 }
