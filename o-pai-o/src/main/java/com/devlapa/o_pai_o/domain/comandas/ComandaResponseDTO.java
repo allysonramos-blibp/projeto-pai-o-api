@@ -1,6 +1,9 @@
 package com.devlapa.o_pai_o.domain.comandas;
 
+import org.springframework.cglib.core.Local;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record ComandaResponseDTO(
@@ -9,7 +12,8 @@ public record ComandaResponseDTO(
         String nomeCliente,
         String status,
         BigDecimal valorTotal,
-        List<ItemResponseDTO> itens // ADICIONE ESTA LINHA
+        LocalDateTime dataAbertura,
+        List<ItemResponseDTO> itens
 ) {
     public ComandaResponseDTO(Comanda comanda) {
         this(
@@ -18,6 +22,7 @@ public record ComandaResponseDTO(
                 comanda.getNomeCliente(),
                 comanda.getStatus().toString(),
                 comanda.getValorTotal(),
+                comanda.getDataAbertura(),
                 comanda.getItens() != null ?
                         comanda.getItens().stream().map(ItemResponseDTO::new).toList() :
                         List.of()

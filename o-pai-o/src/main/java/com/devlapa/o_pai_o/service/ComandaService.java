@@ -161,7 +161,7 @@ public class ComandaService {
         Usuarios usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + usuarioId));
 
-        // Vincula forma de pagamento apenas se pagar agora
+
         if (!pagarDepois) {
             if (formaPagamentoId == null) {
                 throw new RuntimeException("Forma de pagamento é obrigatória ao pagar agora.");
@@ -177,7 +177,6 @@ public class ComandaService {
         comanda.setStatus(StatusComanda.FINALIZADA);
         Comanda comandaSalva = comandaRepository.save(comanda);
 
-        // Cria conta a receber automaticamente
         ContasReceber conta = new ContasReceber();
         conta.setCliente(comanda.getNomeCliente() != null ? comanda.getNomeCliente() : "Mesa " + comanda.getNumeroMesa());
         conta.setDescricao("Comanda #" + comanda.getId() + " — Mesa " + comanda.getNumeroMesa());

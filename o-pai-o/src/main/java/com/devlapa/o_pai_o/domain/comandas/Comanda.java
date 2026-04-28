@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +27,20 @@ public class Comanda {
 
     private BigDecimal valorTotal = BigDecimal.ZERO;
 
+    @Column(name = "data_abertura", updatable = false)
+    private LocalDateTime dataAbertura;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "forma_pagamento_id")
     private FormasPagamentos formaPagamento;
 
     @OneToMany(mappedBy = "comanda", cascade = CascadeType.ALL)
     private List<ItemComanda> itens = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist(){
+        if (this.dataAbertura == null) {
+            this.dataAbertura = LocalDateTime.now();
+        }
+    }
 }
