@@ -3,6 +3,7 @@ package com.devlapa.o_pai_o.service;
 import com.devlapa.o_pai_o.domain.categorias.CategoriaRequestDTO;
 import com.devlapa.o_pai_o.domain.categorias.CategoriaResponseDTO;
 import com.devlapa.o_pai_o.domain.categorias.Categorias;
+import com.devlapa.o_pai_o.domain.produtos.Produtos;
 import com.devlapa.o_pai_o.repositories.CategoriasRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,13 +27,13 @@ public class CategoriaServices {
     GeradordeIdServices geradordeIdServices;
 
     public Categorias createCategoria(CategoriaRequestDTO data){
+        if(categorias.existsByNome(data.nome())){
+            throw new RuntimeException("Categoria já existente");
+        }
         Categorias newCategoria = new Categorias();
-        newCategoria.setId(geradordeIdServices.geradorDeId(categorias));
         newCategoria.setNome(data.nome());
         newCategoria.setDescricao(data.descricao());
-        newCategoria.PrePersist();
-        categorias.save(newCategoria);
-        return newCategoria;
+        return categorias.save(newCategoria);
 
     }
 
@@ -58,6 +59,11 @@ public class CategoriaServices {
     public void deleteCategoria(Long id) {
         Categorias categoria = categorias.findById(id)
                 .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        Produtos produtos = new Produtos();
+
+        if(categoria == produtos.getCategoria()){
+            throw new RuntimeException("Existem produtos com essa categoria");
+        }
         categorias.delete(categoria);
     }
 }

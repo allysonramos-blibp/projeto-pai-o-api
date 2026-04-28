@@ -1,4 +1,3 @@
-git push origin develop
 # API - Gestão de Usuários
 
 API REST desenvolvida com Spring Boot para controle de acesso, perfis e autenticação.

@@ -34,6 +34,7 @@ public class UsuarioService {
 
     @Transactional
     public UsuariosResponseDTO salvar(UsuariosRequestDTO dto) {
+
         if (usuarioRepository.existsByLogin(dto.login())){
             throw new RuntimeException("Login já está em uso");
         }
