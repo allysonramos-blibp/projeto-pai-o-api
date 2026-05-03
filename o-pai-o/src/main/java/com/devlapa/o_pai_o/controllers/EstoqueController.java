@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/estoque")
@@ -70,5 +71,15 @@ public class EstoqueController {
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         service.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/baixo/count")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    public ResponseEntity<Map<String, Object>> getEstoqueBaixoCount() {
+        long count = repository.findAll().stream()
+                .filter(e -> e.getQuantidade() <= e.getMinimo())
+                .count();
+
+        return ResponseEntity.ok(Map.of("total", count));
     }
 }

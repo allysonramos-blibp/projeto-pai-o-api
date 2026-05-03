@@ -26,6 +26,7 @@ public class ContasPagarController {
     }
 
     @GetMapping("/resumo")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
     public ResponseEntity<Map<String, BigDecimal>> obterResumo() {
         return ResponseEntity.ok(service.obterResumoFinanceiro());
     }

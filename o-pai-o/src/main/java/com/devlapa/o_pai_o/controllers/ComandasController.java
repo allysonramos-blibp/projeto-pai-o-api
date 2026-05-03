@@ -57,9 +57,19 @@ public class ComandasController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
     public ResponseEntity<ComandaResponseDTO> finalizar(
             @PathVariable Long id,
-            @RequestBody Map<String, Long> body) {
-        Long formaPagamentoId = body.get("formaPagamentoId");
-        Comanda comandaFinalizada = comandaService.finalizarPagamento(id, formaPagamentoId);
+            @RequestBody Map<String, Object> body) {
+
+        Long formaPagamentoId = body.get("formaPagamentoId") != null
+                ? Long.valueOf(body.get("formaPagamentoId").toString())
+                : null;
+
+        Long usuarioId = body.get("usuarioId") != null
+                ? Long.valueOf(body.get("usuarioId").toString())
+                : null;
+
+        boolean pagarDepois = Boolean.TRUE.equals(body.get("pagarDepois"));
+
+        Comanda comandaFinalizada = comandaService.finalizarPagamento(id, formaPagamentoId, usuarioId, pagarDepois);
         return ResponseEntity.ok(new ComandaResponseDTO(comandaFinalizada));
     }
 
@@ -76,5 +86,22 @@ public class ComandasController {
     public ResponseEntity<Void> removerItem(@PathVariable Long itemId) {
         comandaService.removerItem(itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/abertas/resumo")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    public ResponseEntity<Map<String, Object>> getResumoAbertas() {
+        var abertas = repository.findAll().stream()
+                .filter(c -> c.getStatus() == StatusComanda.ABERTA)
+                .toList();
+
+        double valorTotal = abertas.stream()
+                .mapToDouble(c -> c.getValorTotal().doubleValue())
+                .sum();
+
+        return ResponseEntity.ok(Map.of(
+                "quantidade", abertas.size(),
+                "valorTotal", valorTotal
+        ));
     }
 }
