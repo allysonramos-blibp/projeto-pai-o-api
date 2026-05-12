@@ -132,12 +132,10 @@ public class VendasService {
                             "Estoque não encontrado para o produto: " + itens.getProduto().getNome()
                     ));
 
-            if (estoque.getQuantidade().compareTo(itens.getQuantidade()) < 0) {
-                throw new RuntimeException("Estoque insuficiente para " + itens.getProduto().getNome());
-            }
+            estoque.baixarEstoque(itens.getQuantidade());
 
-            estoque.setQuantidade(estoque.getQuantidade() - itens.getQuantidade());
             estoque.setDataModificacao(LocalDateTime.now());
+
             estoqueRepository.save(estoque);
         }
 
@@ -169,7 +167,8 @@ public class VendasService {
     public BigDecimal getTotalHoje() {
         LocalDateTime inicioDia = LocalDate.now().atStartOfDay();
         LocalDateTime fimDia = inicioDia.plusDays(1);
-        return vendasRepository.somarTotalPorPeriodo(inicioDia, fimDia, StatusVenda.PAGA);
+        BigDecimal total = vendasRepository.somarTotalPorPeriodo(inicioDia, fimDia, StatusVenda.PAGA);
+        return (total == null) ? BigDecimal.ZERO : total;
     }
 
     @Transactional

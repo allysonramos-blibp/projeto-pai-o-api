@@ -74,7 +74,7 @@
 
 
         @GetMapping("/total-hoje")
-        @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
+        @PreAuthorize("hasAnyRole('ADMIN','GERENTE', 'USUARIO')")
         public ResponseEntity<BigDecimal> getTotalHoje() {
             return ResponseEntity.ok(vendasService.getTotalHoje());
         }

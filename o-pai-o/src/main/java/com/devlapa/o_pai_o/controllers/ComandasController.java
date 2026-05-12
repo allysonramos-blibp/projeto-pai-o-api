@@ -24,21 +24,21 @@ public class ComandasController {
     private ComandaRepository repository;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<List<ComandaResponseDTO>> listar() {
         var lista = repository.findAll().stream().map(ComandaResponseDTO::new).toList();
         return ResponseEntity.ok(lista);
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<ComandaResponseDTO> abrir(@RequestBody @Valid ComandaRequestDTO dados) {
         var comanda = comandaService.abrirNovaComanda(dados);
         return ResponseEntity.status(HttpStatus.CREATED).body(new ComandaResponseDTO(comanda));
     }
 
     @PostMapping("/{id}/itens")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<ItemResponseDTO> adicionarItem(
             @PathVariable Long id,
             @RequestBody @Valid ItemRequestDTO dados) {
@@ -54,7 +54,7 @@ public class ComandasController {
     }
 
     @PatchMapping("/{id}/finalizar")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<ComandaResponseDTO> finalizar(
             @PathVariable Long id,
             @RequestBody Map<String, Object> body) {
@@ -74,7 +74,7 @@ public class ComandasController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<ComandaResponseDTO> buscarPorId(@PathVariable Long id) {
         var comanda = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Comanda não encontrada"));
@@ -82,14 +82,14 @@ public class ComandasController {
     }
 
     @DeleteMapping("/itens/{itemId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<Void> removerItem(@PathVariable Long itemId) {
         comandaService.removerItem(itemId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/abertas/resumo")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'GARCOM')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<Map<String, Object>> getResumoAbertas() {
         var abertas = repository.findAll().stream()
                 .filter(c -> c.getStatus() == StatusComanda.ABERTA)

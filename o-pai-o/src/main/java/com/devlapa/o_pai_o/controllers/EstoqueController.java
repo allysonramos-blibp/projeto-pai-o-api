@@ -27,7 +27,7 @@ public class EstoqueController {
     private EstoqueRepository repository;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<List<EstoqueResponseDTO>> listar() {
         var lista = service.listarTodos();
         return ResponseEntity.ok(lista);
@@ -74,7 +74,7 @@ public class EstoqueController {
     }
 
     @GetMapping("/baixo/count")
-    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<Map<String, Object>> getEstoqueBaixoCount() {
         long count = repository.findAll().stream()
                 .filter(e -> e.getQuantidade() <= e.getMinimo())
