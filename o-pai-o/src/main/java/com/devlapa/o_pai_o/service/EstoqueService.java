@@ -74,6 +74,27 @@ public class EstoqueService {
         estoque.verificarStatus();
         repository.save(estoque);
     }
+
+    @Transactional
+    public void atualizar(Long id, EstoqueRequestDTO dados) {
+        var estoque = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Registro de estoque não encontrado"));
+
+
+        if (dados.quantidade() != null) {
+            estoque.setQuantidade(dados.quantidade());
+        }
+        if (dados.minimo() != null) {
+            estoque.setMinimo(dados.minimo());
+        }
+
+        estoque.setDataModificacao(LocalDateTime.now());
+        estoque.verificarStatus();
+
+        repository.save(estoque);
+    }
+
+
     @Transactional
     public void excluir(Long id) {
         var estoque = repository.findById(id)

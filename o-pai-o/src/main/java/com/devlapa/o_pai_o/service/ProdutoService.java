@@ -35,11 +35,17 @@ public class ProdutoService {
     @Autowired
     private EstoqueRepository estoqueRepository;
 
+
+
+    @Autowired
+    private GeradordeIdServices geradordeIdServices;
+
+
     public Produtos createproduto(ProdutosRequestDTO body) {
-        Categorias categorias = categoriasRepository.findById(body.categoriaId())
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
-        Fornecedores fornecedores = fornecedoresRepository.findById(body.fornecedoresId())
-                .orElseThrow(() -> new RuntimeException("Fornecedor não encontrado"));
+        Categorias categorias = (body.categoriaId() != null)
+                ? categoriasRepository.findById(body.categoriaId()).orElse(null) : null;
+        Fornecedores fornecedores = (body.fornecedoresId() != null)
+                ? fornecedoresRepository.findById(body.fornecedoresId()).orElse(null) : null;
 
         Produtos newProdutos = new Produtos();
         newProdutos.setNome(body.nome());

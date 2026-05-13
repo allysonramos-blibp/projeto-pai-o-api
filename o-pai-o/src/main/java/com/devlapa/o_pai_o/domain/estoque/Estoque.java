@@ -38,11 +38,13 @@ public class Estoque {
     @PrePersist
     public void prePersist() {
         this.dataCadastro = LocalDateTime.now();
+        verificarStatus();
     }
 
     @PreUpdate
     public void preUpdate() {
         this.dataModificacao = LocalDateTime.now();
+        verificarStatus();
     }
 
     public void baixarEstoque(Integer qtdVendida) {
@@ -59,9 +61,13 @@ public class Estoque {
     }
 
     public void verificarStatus() {
-        if (this.quantidade == null || this.quantidade <= 0) {
+
+        int qtd = (this.quantidade != null) ? this.quantidade : 0;
+        int min = (this.minimo != null) ? this.minimo : 0;
+
+        if (qtd <= 0) {
             this.status = StatusEstoque.ESGOTADO;
-        } else if (this.minimo != null && this.quantidade <= this.minimo) {
+        } else if (qtd <= min) {
             this.status = StatusEstoque.BAIXO;
         } else {
             this.status = StatusEstoque.NORMAL;
