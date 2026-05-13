@@ -33,7 +33,6 @@ public class EstoqueController {
         return ResponseEntity.ok(lista);
     }
 
-
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
     public ResponseEntity<Void> cadastrar(@RequestBody @Valid EstoqueRequestDTO dados) {
@@ -41,16 +40,23 @@ public class EstoqueController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PatchMapping ("/{id}")
+
+    @PatchMapping("/{id}/entrada")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_GERENTE')")
     public ResponseEntity<EstoqueResponseDTO> registrarEntrada(
             @PathVariable Long id,
             @RequestBody @Valid EstoquePatchDTO dto) {
-
         service.registrarEntrada(id, dto.quantidade());
-
         var estoque = repository.getReferenceById(id);
         return ResponseEntity.ok(new EstoqueResponseDTO(estoque));
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE')")
+    @Transactional
+    public ResponseEntity<Void> atualizar(@PathVariable Long id, @RequestBody EstoqueRequestDTO dados) {
+        service.atualizar(id, dados);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/produto/{produtoId}")
@@ -59,10 +65,7 @@ public class EstoqueController {
     public ResponseEntity<Void> atualizarPeloProduto(
             @PathVariable Long produtoId,
             @RequestBody @Valid EstoqueRequestDTO dados) {
-
-
         service.atualizarPeloProduto(produtoId, dados.quantidade(), dados.minimo());
-
         return ResponseEntity.ok().build();
     }
 
@@ -79,7 +82,6 @@ public class EstoqueController {
         long count = repository.findAll().stream()
                 .filter(e -> e.getQuantidade() <= e.getMinimo())
                 .count();
-
         return ResponseEntity.ok(Map.of("total", count));
     }
 }
