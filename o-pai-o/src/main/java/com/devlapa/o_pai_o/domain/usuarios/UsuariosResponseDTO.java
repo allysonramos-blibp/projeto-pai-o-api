@@ -9,4 +9,8 @@ public record UsuariosResponseDTO(
         String perfil,
         Boolean ativo,
         LocalDateTime dataCadastro
-) {}
+) {
+    public UsuariosResponseDTO(Usuarios u) {
+        this(u.getId(), u.getNome(), u.getLogin(), u.getPerfil(), u.getAtivo(), u.getDataCadastro());
+    }
+}
