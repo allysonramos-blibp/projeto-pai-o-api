@@ -12,8 +12,10 @@ import java.util.List;
 
 public interface VendasRepository extends JpaRepository<Vendas, Long> {
 
+
+    @Query("SELECT DISTINCT v FROM Vendas v LEFT JOIN FETCH v.itens ORDER BY v.id DESC")
     List<Vendas> findAllByOrderByIdDesc();
 
     @Query("SELECT COALESCE(SUM(v.valor_total), 0) FROM Vendas v WHERE v.data_criacao >= :inicio AND v.data_criacao < :fim AND v.status = :status")
-    BigDecimal somarTotalPorPeriodo(LocalDateTime inicio, LocalDateTime fim, StatusVenda status);
+    BigDecimal somarTotalPorPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim, @Param("status") StatusVenda status);
 }
