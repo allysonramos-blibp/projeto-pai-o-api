@@ -85,13 +85,9 @@ public class UsuariosController {
     }
 
     @PostMapping("/esqueci-senha")
-    public ResponseEntity<?> esqueciSenha(@RequestBody EsqueciSenhaDTO dto) {
-        try {
-            usuarioService.solicitarRecuperacaoSenha(dto.login());
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<Void> esqueciSenha(@RequestBody RecuperacaoSenhaRequestDTO dto) {
+        usuarioService.solicitarRecuperacaoSenha(dto);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/redefinir-senha")

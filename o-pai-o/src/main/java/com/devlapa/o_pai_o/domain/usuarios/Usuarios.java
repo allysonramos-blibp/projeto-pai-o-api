@@ -20,14 +20,16 @@ public class Usuarios implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+    private Long id;
 
     @Column(nullable = false)
     private String nome;
 
+    @Column(nullable = false, unique = true)
+    private String login;
 
     @Column(nullable = false)
-    private String login;
+    private String email;
 
     @Column(nullable = false)
     private String hash;
@@ -35,11 +37,10 @@ public class Usuarios implements UserDetails {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCadastro;
 
-    @Column(columnDefinition = "VARCHAR(100) DEFAULT 'USUARIO'")
-    private String perfil;
+    @Column(length = 100)
+    private String perfil = "USUARIO";
 
     private LocalDateTime dataModificacao;
-
 
     @Column(nullable = false)
     private Boolean ativo;
@@ -51,10 +52,8 @@ public class Usuarios implements UserDetails {
         if (this.perfil == null) this.perfil = "USUARIO";
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         String p = (this.perfil != null) ? this.perfil.trim().toUpperCase() : "USUARIO";
 
         if (p.equals("ADMIN")) {
@@ -71,7 +70,6 @@ public class Usuarios implements UserDetails {
                     new SimpleGrantedAuthority("ROLE_USUARIO")
             );
         }
-
 
         return List.of(new SimpleGrantedAuthority("ROLE_USUARIO"));
     }
@@ -107,6 +105,6 @@ public class Usuarios implements UserDetails {
     }
 
     @JsonIgnore
-    @OneToMany(mappedBy = "usuarioCriacao",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "usuarioCriacao", cascade = CascadeType.ALL)
     private List<Vendas> vends;
 }
