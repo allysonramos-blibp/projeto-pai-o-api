@@ -1,10 +1,19 @@
 package com.devlapa.o_pai_o.domain.usuarios;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "tokens_recuperacao")
 public class TokenRecuperacao {
 
@@ -21,8 +30,6 @@ public class TokenRecuperacao {
 
     @Column(nullable = false)
     private LocalDateTime dataExpiracao;
-
-    public TokenRecuperacao() {}
 
     public TokenRecuperacao(Usuarios usuario) {
         this.usuario = usuario;

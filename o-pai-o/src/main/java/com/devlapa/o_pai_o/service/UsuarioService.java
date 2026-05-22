@@ -31,7 +31,7 @@ public class UsuarioService {
     public List<UsuariosResponseDTO> listarTodos() {
         return usuarioRepository.findByAtivoTrue().stream()
                 .map(u -> new UsuariosResponseDTO(
-                        u.getId(), u.getNome(), u.getLogin(),
+                        u.getId(), u.getNome(), u.getLogin(), u.getEmail(),
                         u.getPerfil(), u.getAtivo(), u.getDataCadastro()
                 )).toList();
     }
@@ -44,13 +44,14 @@ public class UsuarioService {
         Usuarios usuario = new Usuarios();
         usuario.setNome(dto.nome());
         usuario.setLogin(dto.login());
+        usuario.setEmail(dto.email());
         usuario.setHash(passwordEncoder.encode(dto.senha()));
         usuario.setAtivo(true);
         usuario.setDataCadastro(LocalDateTime.now());
         usuario.setPerfil(dto.perfil() != null && !dto.perfil().isBlank() ? dto.perfil().toUpperCase() : "USUARIO");
 
         Usuarios salvo = usuarioRepository.save(usuario);
-        return new UsuariosResponseDTO(salvo.getId(), salvo.getNome(), salvo.getLogin(), salvo.getPerfil(), salvo.getAtivo(), salvo.getDataCadastro());
+        return new UsuariosResponseDTO(salvo.getId(), salvo.getNome(), salvo.getLogin(), salvo.getEmail(), salvo.getPerfil(), salvo.getAtivo(), salvo.getDataCadastro());
     }
 
     @Transactional
@@ -58,6 +59,7 @@ public class UsuarioService {
         Usuarios usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         usuario.setNome(dto.nome());
         usuario.setLogin(dto.login());
+        usuario.setEmail(dto.email());
         if (dto.perfil() != null && !dto.perfil().isBlank()) {
             usuario.setPerfil(dto.perfil().toUpperCase());
         }
@@ -66,7 +68,7 @@ public class UsuarioService {
         }
         usuario.setDataModificacao(LocalDateTime.now());
         Usuarios atualizado = usuarioRepository.save(usuario);
-        return new UsuariosResponseDTO(atualizado.getId(), atualizado.getNome(), atualizado.getLogin(), atualizado.getPerfil(), atualizado.getAtivo(), atualizado.getDataCadastro());
+        return new UsuariosResponseDTO(atualizado.getId(), atualizado.getNome(), atualizado.getLogin(), atualizado.getEmail(), atualizado.getPerfil(), atualizado.getAtivo(), atualizado.getDataCadastro());
     }
 
     @Transactional
@@ -84,13 +86,19 @@ public class UsuarioService {
     }
 
     @Transactional
-    public void solicitarRecuperacaoSenha(String login) {
-        Usuarios usuario = usuarioRepository.findByLogin(login).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    public void solicitarRecuperacaoSenha(RecuperacaoSenhaRequestDTO dto) {
+        Usuarios usuario = usuarioRepository.findByLogin(dto.login())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado no sistema"));
+
+        usuario.setEmail(dto.email());
+        usuarioRepository.save(usuario);
+
         tokenRepository.deleteByUsuarioId(usuario.getId());
         TokenRecuperacao tokenObj = new TokenRecuperacao(usuario);
         tokenRepository.save(tokenObj);
+
         String linkRecuperacao = frontendUrl + "/redefinir-senha?token=" + tokenObj.getToken();
-        emailService.enviarEmailRecuperacao(usuario.getLogin(), usuario.getNome(), linkRecuperacao);
+        emailService.enviarEmailRecuperacao(usuario.getEmail(), usuario.getNome(), linkRecuperacao);
     }
 
     @Transactional
