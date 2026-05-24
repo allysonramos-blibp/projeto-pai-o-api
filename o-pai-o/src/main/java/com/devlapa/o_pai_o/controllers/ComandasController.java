@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,9 +25,12 @@ public class ComandasController {
     private ComandaRepository repository;
 
     @GetMapping
+    @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'GERENTE', 'USUARIO')")
     public ResponseEntity<List<ComandaResponseDTO>> listar() {
-        var lista = repository.findAll().stream().map(ComandaResponseDTO::new).toList();
+        var lista = repository.findAllComItens().stream()
+                .map(ComandaResponseDTO::new)
+                .toList();
         return ResponseEntity.ok(lista);
     }
 
