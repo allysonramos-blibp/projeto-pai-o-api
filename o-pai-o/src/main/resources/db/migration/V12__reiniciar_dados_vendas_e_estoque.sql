@@ -1,4 +1,3 @@
-
 TRUNCATE TABLE
     usuarios,
     fornecedores,
@@ -12,8 +11,7 @@ TRUNCATE TABLE
     vendas,
     itens_vendas,
     contas_receber,
-    movimentacoes,
-    flyway_schema_history
+    movimentacoes
 RESTART IDENTITY CASCADE;
 
 
