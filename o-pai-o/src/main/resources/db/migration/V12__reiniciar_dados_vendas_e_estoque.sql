@@ -34,7 +34,7 @@ INSERT INTO usuarios (nome, login, email, hash, perfil, ativo, data_cadastro) VA
                                                                                   ('Allyson Admin',    'allyson.admin',    'canalsttyrf@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LnBsZiNQoZ2', 'ADMIN',   true, CURRENT_TIMESTAMP),
                                                                                   ('Amanda Rezende',   'amanda.user',       'amanda@bar.com',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LnBsZiNQoZ2', 'USUARIO', true, CURRENT_TIMESTAMP),
                                                                                   ('Debora Nascimento', 'debora.gerente',   'debora@bar.com',        '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LnBsZiNQoZ2', 'GERENTE', true, CURRENT_TIMESTAMP),
-                                                                                  ('Cleriston Lima',   'cleristom.admin',   'cleriston@bar.com',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LnBsZiNQoZ2', 'ADMIN',   true, CURRENT_TIMESTAMP);
+                                                                                  ('Cleriston Lima',   'cleriston.admin',   'cleriston@bar.com',     '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LnBsZiNQoZ2', 'ADMIN',   true, CURRENT_TIMESTAMP);
 
 INSERT INTO fornecedores (nome, cnpj, telefone, email, endereco, ativo, data_cadastro) VALUES
                                                                                            ('Ambev Distribuidora', '03.012.345/0001-99', '(34) 3211-0001', 'pedidos@ambev.com.br', 'Av. Industrial, 1000', true, CURRENT_TIMESTAMP),
